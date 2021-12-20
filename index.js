@@ -3,12 +3,10 @@ const express = require('express');
 const app = express();
 const port = 3000;
 
+connectToMongo();
 
-// respond with "hello world" when a GET request is made to the homepage
-app.get('/', function (req, res) {
-  res.send('hello world')
-  connectToMongo();
-})
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/notes', require('./routes/notes'));
 
 app.listen(port, ()=>{
     console.log(`http://localhost:${port}`);
