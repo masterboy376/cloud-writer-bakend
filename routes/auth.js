@@ -2,7 +2,10 @@ const express = require('express');
 const User = require('../models/User');
 const { body, validationResult } = require('express-validator');
 const router = express.Router();
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
+const JWT_SECRET = "Cloud-writer$$$b#SamTHEcoder09";
 
 // create a user using: POST "/api/auth/createuser". No login required.
 router.post('/createuser',[
@@ -16,18 +19,32 @@ router.post('/createuser',[
       return res.status(400).json({ errors: errors.array() });
     }
     try{
-        //check whether the user with same email exist already
+        //check whether the bcryuser with same email exist already
        let user = await User.findOne({email: req.body.email});
        if(user){
         return res.status(400).json({ errors: "Please use different email, user with this already exists" });
        }
+       // crating a secure password
+       const salt = await bcrypt.genSalt(10);
+       const secPassword = await bcrypt.hash(req.body.password, salt);
        //create a new user
        user = await User.create({
             name: req.body.name,
             email: req.body.email,
-            password: req.body.password,
+            password: secPassword,
           })
-        // send user jason as aresponse.  
+        //creating data for authToken
+        const data = {
+            user:{
+                id : user.id
+            }
+        }
+        //creating authToken
+        const authToken = jwt.sign(data, JWT_SECRET);
+        //sending auth token as a response
+        res.json({authToken});
+
+        // send user json as a response.  
         res.json(user);
         }
         //this will return a error only if some internal server error occurs.
