@@ -23,6 +23,10 @@ const notesSchema = new Schema({
         type: Date,
         default: Date.now,  
     },
+    type:{
+        type: String,
+        default: "Typed",  
+    },
     isImp:{
         type: Boolean,
         default: false,
