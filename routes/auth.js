@@ -21,7 +21,7 @@ router.post('/createuser', [
         return res.status(400).json({ errors: errors.array() });
     }
     try {
-        //check whether the bcryuser with same email exist already
+        //check whether the user with same email exist already
         let user = await User.findOne({ email: req.body.email });
         if (user) {
             return res.status(400).json({ errors: "Please use different email, user with this already exists" });
@@ -45,9 +45,6 @@ router.post('/createuser', [
         const authToken = jwt.sign(data, JWT_SECRET);
         //sending auth token as a response
         res.json({ authToken });
-
-        // send user json as a response.  
-        res.json(user);
     }
     //this will return a error only if some internal server error occurs.
     catch (error) {
@@ -107,13 +104,15 @@ router.post('/login', [
 //Gettting loggedin user details using POST "/api/auth/getuser". No login required
 router.post('/getuser', fetchuser,  async (req, res) => {
     try {
-        //finding the user
-      userId = req.user.id;
+      //finding the user
+      const userId = req.user.id;
       const user = await User.findById(userId).select("-password")
+      //sending the user as a response
       res.send(user)
-    } catch (error) {
-      console.error(error.message);
-      res.status(500).send("Internal Server Error");
+    }
+    //this will return a error only if some internal server error occurs.
+    catch (error) {
+        res.status(500).json({ error: `Internal serer error occured!` });
     }
   })
 module.exports = router;

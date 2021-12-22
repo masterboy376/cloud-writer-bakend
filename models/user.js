@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
+//creating a schema for user.
 const userSchema = new Schema({
   name:{
       type: String,
@@ -19,7 +20,12 @@ const userSchema = new Schema({
       type: Date,
       default: Date.now,  
   },
+  type:{
+      type: String,
+      default: "Typed",  
+  },
 });
+//creating User model
 const User = mongoose.model('User', userSchema);
-User.createIndexes;
+//exporting User model
 module.exports = User;
