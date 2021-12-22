@@ -4,9 +4,11 @@ const { body, validationResult } = require('express-validator');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const fetchuser = require('../middleware/fetchuser');
 
 const JWT_SECRET = "Cloud-writer$$$b#SamTHEcoder09";
 
+//Route 1:
 // create a user using: POST "/api/auth/createuser". No login required.
 router.post('/createuser', [
     body('name', 'Enter a valid name...').isLength({ min: 1 }),
@@ -49,11 +51,13 @@ router.post('/createuser', [
     }
     //this will return a error only if some internal server error occurs.
     catch (error) {
-        res.status(500).json({ error: `Internal serer error occured!`});
+        res.status(500).json({ error: `Internal serer error occured!` });
     }
 }
 );
 
+
+//Route 2:
 // Authenticate a user using: POST "/api/auth/login". login required.
 router.post('/login', [
     body('email', 'Enter a valid email...').isEmail(),
@@ -65,18 +69,21 @@ router.post('/login', [
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
-    const {email, password} = await req.body;
+    //Authenticate the user
+    const { email, password } = await req.body;
     try {
         let user = await User.findOne({ email });//no need to write like {email: email} bcoz this is ES6
+        //if user do not exists
         if (!user) {
             return res.status(400).json({ error: `Please try to login with the correct credentials.` });
         }
-
+        //checkung the password 
         const passwordCompare = await bcrypt.compare(password, user.password);
+        //if password is wrong
         if (!passwordCompare) {
             return res.status(400).json({ error: `Please try to login with the correct credentials.` });
         }
-        //creating data for authToken
+        //if password is correct then creating data for authToken
         const data = {
             user: {
                 id: user.id
@@ -90,8 +97,23 @@ router.post('/login', [
     }
     //this will return a error only if some internal server error occurs.
     catch (error) {
-        res.status(500).json({ error: `Internal serer error occured!`});
+        res.status(500).json({ error: `Internal serer error occured!` });
     }
 }
 )
+
+
+//Route 3: 
+//Gettting loggedin user details using POST "/api/auth/getuser". No login required
+router.post('/getuser', fetchuser,  async (req, res) => {
+    try {
+        //finding the user
+      userId = req.user.id;
+      const user = await User.findById(userId).select("-password")
+      res.send(user)
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).send("Internal Server Error");
+    }
+  })
 module.exports = router;
