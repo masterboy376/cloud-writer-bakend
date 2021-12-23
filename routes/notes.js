@@ -90,8 +90,33 @@ router.put('/updatenote/:id', fetchuser, [
     catch (error) {
         res.status(500).json({ error: `Internal serer error occured!` });
     }
-
-
 });
+
+
+//Route 4:
+//this will delete user's notes using: DELETE "/api/notes/deletenote" - Login required
+router.delete('/deletenote/:id', fetchuser, async (req, res) => {
+    try {
+        // Find the note to be deleted and delete it
+        let note = await Note.findById(req.params.id);
+        if (!note) { return res.status(404).json({ error: "Not Found" }) }
+
+        //Allow deletion of the note only if user owns this note.
+        if (note.user.toString() !== req.user.id) {
+            return res.status(401).json({ error: "Not Allowed" });
+        }
+
+        //deleting note
+        note = await Note.findByIdAndDelete(req.params.id);
+        res.json({message: `note with id ${req.params.id} has been deleted!`});
+    }
+    //this will return a error only if some internal server error occurs.
+    catch (error) {
+        res.status(500).json({ error: `Internal serer error occured!` });
+    }
+});
+
+
+
 
 module.exports = router;
