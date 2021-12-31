@@ -23,6 +23,7 @@ router.get('/fetchallnotes', fetchuser, async (req, res) => {
     }
 });
 
+
 //Route 2:
 //this will create user's notes using: POST "/api/notes/addnote" - Login required
 router.post('/addnote', fetchuser, [

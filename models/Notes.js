@@ -28,8 +28,8 @@ const notesSchema = new Schema({
         default: "Typed",  
     },
     isImp:{
-        type: Boolean,
-        default: false,
+        type:Boolean,
+        default:false,
     }
   });
   //creating Notes model
